@@ -110,6 +110,7 @@
 	  		cache: false,
 	  		crossDomain: true,
 	  		success: function(response){
+				console.log(response)
           $(photo_element).removeClass('photo_loading');
 	  			center_point = new google.maps.LatLng(51.508742,-0.120850)
 	  			map_generate_marker(response.photo, photo_object);
@@ -127,6 +128,7 @@
     {
         console.log("map generate marker photo info: ",photo_info);
         var photoLatLng = new google.maps.LatLng(photo_info.location.latitude,photo_info.location.longitude);
+		console.log(photoLatLng);
         console.log("photo object",photo_object);
         var flickr_photo = {
             url: photo_url_create(photo_object),
