@@ -1,10 +1,11 @@
 var the_game = null;
+//document.ready needed to initialize new object
 $(document).ready(function() {
 	the_game = new game_template($('#game_container'));
 	the_game.register_message_display($('#messages'));
 });
-
-var game_template = function(container){
+//changed to function
+function game_template(container){
 	var self=this;
 	self.actors = [];
 	self.actor_count = 10;
@@ -38,7 +39,8 @@ var game_template = function(container){
 		return self.accuracy;
 	};
 	self.calculate_accuracy = function(){
-		var accuracy =  self.stats.shots / self.stats.hits;
+		//self.shots and self.hits were flipped (Issue 7: resolved)
+		var accuracy =  self.stats.hits / self.stats.shots;
 		return accuracy;
 	};
 	self.create_sound_players = function(){
@@ -71,7 +73,7 @@ var game_template = function(container){
 		}
 	};
 	self.game_over = function(){
-		self.display_message('You won!<br>Accuracy: %'+(self.calculate_accuracy()*100));
+		self.display_message('You won!<br>Accuracy: %'+(self.calculate_accuracy()*100).toFixed(2));
 	};
 	self.register_click_handler = function(){
 		self.game_container.click(self.clicked);
@@ -79,6 +81,8 @@ var game_template = function(container){
 	self.clicked = function(){
 		self.play_gunshot();
 		self.add_shot();
+		//let's see if this works. I think .die might need to be called on click since nothing happens currently onclick
+		self.die();
 	};
 	self.add_shot = function(){
 		self.stats.shots++;	
@@ -91,9 +95,10 @@ var game_template = function(container){
 		self.accuracy = self.calculate_accuracy();
 		self.stats_handler.update_stats();
 	};
+	//changed .paused to pause to resolve issue #6
 	self.play_gunshot = function(){
 		var index=0;
-		while(!self.audio_sources[index].paused ){ 		
+		while(!self.audio_sources[index].pause){
 			index++;
 		}
 		if(index<self.audio_sources_max){
@@ -125,8 +130,8 @@ var game_template = function(container){
 	self.init();
 	return self;
 };
-
-var stats_template = function(stats_container, game){
+//needs to be defined as a function
+function stats_template(stats_container, game){
 	var self=this;
 	self.stats_container = $(stats_container);
 	self.remaining_text = self.stats_container.find('.remaining > span');
@@ -134,16 +139,17 @@ var stats_template = function(stats_container, game){
 	self.game = game;
 	self.init = function(){
 		self.update_stats();
-	}
+	};
 	self.update_stats = function(){
 		self.remaining_text.text(game.get_actor_count());
-		self.accuracy_text.text(game.get_accuracy()*100+'%');
-	}
+		//Issue3: Storing Stats accuracy to hundredths digit
+		self.accuracy_text.text((game.get_accuracy()*100).toFixed(2)+'%');
+	};
 	self.init();
 	return self;
 }
-
-var actor_template = function(parent, container,index){
+//needs to be defined as a function
+function actor_template(parent, container,index){
 	var self=this;
 	self.parent = parent;
 	self.element = null;
@@ -156,7 +162,7 @@ var actor_template = function(parent, container,index){
 	self.delta_distance = 0.05;
 	self.distance_to_move = null;
 	self.index=index;
-
+//Issue 2: self.calculate_new_heartbeat had a closing curly brace issue that prevented the actor's from showing up
 	self.calculate_new_heartbeat = function(){
 		self.heartbeat_delta = Math.floor(Math.random()*self.heartbeat_variance_range*2)-self.heartbeat_variance_range;
 		return self.heartbeat_delta;
@@ -197,7 +203,8 @@ var actor_template = function(parent, container,index){
 		  x_shift = 1;
 		}
 		else if(current_position.left + self.distance_to_move > self.container.width()){
-		  x_shift = 1;
+		 //got the turkeys to stay within the screen container (Issue:5)
+		   x_shift = -1;
 		}
 		if(current_position.top - self.distance_to_move < 0) {
 			y_shift = 1;
@@ -229,6 +236,7 @@ var actor_template = function(parent, container,index){
 	};
 	self.start_delete = function(){
 		self.element.css('display','none');
+		//function call missing from self.full delete
 		setTimeout(self.full_delete,1000);
 	};
 	self.full_delete = function(){
