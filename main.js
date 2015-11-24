@@ -1,8 +1,8 @@
 var the_game = null;
-
-the_game = new game_template($('#game_container'));
-the_game.register_message_display($('#messages'));
-
+$(document).ready(function() {
+	the_game = new game_template($('#game_container'));
+	the_game.register_message_display($('#messages'));
+});
 
 var game_template = function(container){
 	var self=this;
@@ -137,7 +137,7 @@ var stats_template = function(stats_container, game){
 	}
 	self.update_stats = function(){
 		self.remaining_text.text(game.get_actor_count());
-		self.accuracy_text.text(game.get_accuracy()*100+'%');		
+		self.accuracy_text.text(game.get_accuracy()*100+'%');
 	}
 	self.init();
 	return self;
@@ -147,7 +147,7 @@ var actor_template = function(parent, container,index){
 	var self=this;
 	self.parent = parent;
 	self.element = null;
-	self.container = container; 
+	self.container = container;
 	self.heartbeat_time_max = 750;
 	self.heartbeat_variance = .5;
 	self.heartbeat_variance_range = self.heartbeat_time_max * self.heartbeat_variance;
@@ -157,7 +157,7 @@ var actor_template = function(parent, container,index){
 	self.distance_to_move = null;
 	self.index=index;
 
-	self.calculate_new_heartbeat = function(){}
+	self.calculate_new_heartbeat = function(){
 		self.heartbeat_delta = Math.floor(Math.random()*self.heartbeat_variance_range*2)-self.heartbeat_variance_range;
 		return self.heartbeat_delta;
 	};
@@ -199,9 +199,11 @@ var actor_template = function(parent, container,index){
 		else if(current_position.left + self.distance_to_move > self.container.width()){
 		  x_shift = 1;
 		}
-		if(current_position.top - self.distance_to_move < 0){
-		  y_shift = 1;
-		
+		if(current_position.top - self.distance_to_move < 0) {
+			y_shift = 1;
+			//Issue 1: if statement is not closed, added curly brace
+		}
+
 		else if(current_position.top + self.distance_to_move > self.container.height()){
 		  y_shift = -1;
 		}
