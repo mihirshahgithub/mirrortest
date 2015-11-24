@@ -73,7 +73,7 @@ function game_template(container){
 		}
 	};
 	self.game_over = function(){
-		self.display_message('You won!<br>Accuracy: %'+(self.calculate_accuracy()*100).toFixed(2));
+		self.display_message('You won!<br>Accuracy:'+(self.calculate_accuracy()*100).toFixed(2)+'%');
 	};
 	self.register_click_handler = function(){
 		self.game_container.click(self.clicked);
@@ -222,6 +222,8 @@ function actor_template(parent, container,index){
 	self.clicked = function(){
 		self.add_hit();
 		self.hit_sound();
+		//Fixed Issue # 4 Here by adding a self.die() call in this self. clicked function
+		self.die();
 
 	};
 	self.add_hit = function(){
@@ -237,7 +239,7 @@ function actor_template(parent, container,index){
 	self.start_delete = function(){
 		self.element.css('display','none');
 		//function call missing from self.full delete
-		setTimeout(self.full_delete,1000);
+		setTimeout(self.full_delete(),1000);
 	};
 	self.full_delete = function(){
 		this.element.remove();
